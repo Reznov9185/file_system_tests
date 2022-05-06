@@ -14,7 +14,7 @@ plt.scatter(out1_range,out1,color='green',label="Time(sec)",marker="1")
 plt.legend()
 plt.xlabel('File Sizes, in KB')
 plt.ylabel('Time in Sec')
-plt.title("Block wise varying size(KB) read times. 4KB Clusters are found")
+# plt.title("Block wise varying size(KB) read times. 4KB Clusters are found")
 plt.savefig("out1.png")
 plt.clf()
 
@@ -32,7 +32,7 @@ plt.scatter(out2_range,out2,color='green',label="Time(sec)",marker=".")
 plt.legend()
 plt.xlabel('Offset from the file(in bytes)')
 plt.ylabel('Time in Sec')
-plt.title("Prefetch detection in reading large file.(10GB)")
+# plt.title("Prefetch detection in reading large file.(10GB)")
 plt.savefig("out2.png")
 plt.clf()
 
@@ -64,9 +64,24 @@ mean_line_out3_1 = ax.plot(out3_range_1, out3_mean_1, label="Time(sec)", linesty
 plt.legend()
 plt.xlabel('Iteration No.')
 plt.ylabel('Time in Sec')
-plt.title("Read same file cache block vs seperate ones")
+# plt.title("Read same file cache block vs seperate ones")
 plt.savefig("out3.png")
 plt.clf()
 
-# plt.plot(out3_range,out3,color='green', label="Time(sec)",marker=".")
-# plt.plot(out3_range_1,out3_1,color='blue', label="Time(sec)",marker="*")
+# For question 4
+f4 = open("out4.txt", "r")
+f4_range = open("out4_range.txt", "r")
+out4=[float(x.rstrip()) for x in f4]
+out4_range=[float(x.rstrip()) for x in f4_range]
+f4.close()
+f4_range.close()
+out4=np.array(out4)[::-1]
+out4_range=np.array(out4_range)[::-1]
+
+plt.scatter(out4_range,out4,label="Time(sec)",marker="2")
+plt.legend()
+plt.xlabel('Block Size(in numbers from stat())')
+plt.ylabel('Time in Sec')
+# plt.title("Timing based on block size (8MB to 24MB's block sizes)")
+plt.savefig("out4.png")
+plt.clf()

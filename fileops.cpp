@@ -248,6 +248,7 @@ int readTest()
         }
         gettimeofday(&end_time, NULL);
         time_rdtsc = rdtsc() - time_rdtsc;
+        fsync(fd);
         close(fd);
         struct stat buffer;
         int status;
@@ -341,6 +342,7 @@ int largeReadTest()
         cout << endl
              << "=================================================================" << endl;
     }
+    fsync(fd);
     close(fd);
     system(("rm -f " + file_name).c_str());
     cout << "Test ends." << endl;
@@ -461,26 +463,6 @@ int fileCacheTest(int cache_linesize)
 
 int fileAllocMethodTest()
 {
-    // int fd;
-    // fd = open("out3.txt", O_RDONLY);
-
-    // if (fd < 0)
-    // {
-    //     cout << "Error: " << strerror(errno) << endl;
-    // }
-
-    // struct stat file_stat;
-    // int ret;
-    // ret = fstat(fd, &file_stat);
-    // if (ret < 0)
-    // {
-    //     cout << "Error: " << strerror(errno) << endl;
-    // }
-
-    // inode()
-
-    // cout << "Inode: " << file_stat.st_ino << "; Blocks: " << file_stat.st_blocks << endl;
-
     struct timeval start_time;
     struct timeval end_time;
     uint64_t time_rdtsc;
@@ -492,14 +474,15 @@ int fileAllocMethodTest()
     cout << "Test starts..." << endl;
 
     // Test block starts
-    // ofstream output_file1("out1.txt");
+    ofstream output_file4("out4.txt");
+    ofstream output_file4_range("out4_range.txt");
     cout << endl
          << "=================================================================" << endl;
-    for (int i = 1; i <= 1; i++)
+    for (int i = 8; i <= 24; i++)
     {
-        string file_name = "fileOf" + to_string(i) + "kb";
+        string file_name = "fileOf" + to_string(i* 1024) + "mb";
         int fd = open(file_name.c_str(), O_CREAT|O_RDWR);
-        fallocate(fd, O_RDONLY, 0, i*1024);
+        fallocate(fd, O_RDONLY, 0, i*1024*1024);
         int size;
         char *c = (char *)calloc(KB(i), i * 1024);
         lseek(fd, 0, SEEK_SET);
@@ -511,6 +494,7 @@ int fileAllocMethodTest()
         }
         gettimeofday(&end_time, NULL);
         time_rdtsc = rdtsc() - time_rdtsc;
+        fsync(fd);
         close(fd);
         struct stat buffer;
         int status;
@@ -519,15 +503,19 @@ int fileAllocMethodTest()
         time_elapsed = sec;
         ms = (end_time.tv_usec - start_time.tv_usec) / 1000.0;
         time_elapsed += ms / 1000;
-        cout << "File of size: " << i << "KB. "
+        cout << "File of size: " << i << "MB. "
              << "ST Blocks " << buffer.st_blocks << ". BLKsize " << buffer.st_blksize;
         cout << ". Cycle elapsed(using rdtsc()): " << time_rdtsc << " cycle(s)" << endl;
         cout << "Time elapsed(using gettimeofday()): " << time_elapsed << " second(s)" << endl;
         cout << "Time elapsed(using clockspeed): " << (double)time_rdtsc / tsc_hz << " second(s)" << endl;
+        output_file4 << (double)time_rdtsc / tsc_hz << endl;
+        output_file4_range << buffer.st_blocks << endl;
         system(("rm -f " + file_name).c_str());
     }
     // Test block ends
     cout << "Test ends." << endl;
+    cout << endl
+         << "=================================================================" << endl;
     return 0;
 }
 
